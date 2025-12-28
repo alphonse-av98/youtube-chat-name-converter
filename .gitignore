@@ -1,0 +1,37 @@
+# --- OS generated files ---
+.DS_Store
+Thumbs.db
+
+# --- Node.js (npmを使用する場合) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Build output (webpackやviteなどを使う場合) ---
+dist/
+build/
+out/
+
+# --- Chrome Extension Specific ---
+# 拡張機能をパッケージ化した際のバイナリファイル
+*.crx
+*.xpi
+
+# 拡張機能の秘密鍵（公開すると他人が更新できてしまうため、絶対に含めない）
+*.pem
+
+# --- Editors / IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Misc ---
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*~
+*.log

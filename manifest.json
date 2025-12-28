@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Chat Name Converter",
+  "version": "1.0.0",
+  "description": "A Chrome extension that converts YouTube handles (e.g., @user-id) back to original channel names in the live chat.",
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content.js"],
+      "all_frames": true,
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["bridge.js"],
+      "all_frames": true
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.youtube.com/*"]
+}
