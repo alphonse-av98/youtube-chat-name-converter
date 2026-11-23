@@ -37,10 +37,14 @@
 
   return Object.freeze({
     STORAGE_KEYS: Object.freeze({
+      ENABLED: 'enabled',
       TARGET_HANDLES: 'targetHandles',
       CACHE_PREFIX: 'ycnc_cache:',
       CACHE_CLEARED_AT: 'ycnc_cache_cleared_at',
       LEGACY_LOCAL_STORAGE_PREFIX: 'YCNC:',
+    }),
+    MESSAGES: Object.freeze({
+      GET_CONTEXT: 'YCNC_GET_CONTEXT',
     }),
     CACHE: Object.freeze({
       TTL_MS: 30 * 24 * 60 * 60 * 1000, // 30 days

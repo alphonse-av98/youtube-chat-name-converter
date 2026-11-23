@@ -100,6 +100,15 @@
     );
   }
 
+  async function getEnabled(area = getDefaultStorageArea()) {
+    const data = await storageGet(area, [STORAGE_KEYS.ENABLED]);
+    return data[STORAGE_KEYS.ENABLED] !== false;
+  }
+
+  async function setEnabled(enabled, area = getDefaultStorageArea()) {
+    await storageSet(area, { [STORAGE_KEYS.ENABLED]: Boolean(enabled) });
+  }
+
   async function getTargetHandles(area = getDefaultStorageArea()) {
     const data = await storageGet(area, [STORAGE_KEYS.TARGET_HANDLES]);
     const list = data[STORAGE_KEYS.TARGET_HANDLES];
@@ -197,6 +206,8 @@
     buildCacheKey,
     isCacheKey,
     isValidCacheEntry,
+    getEnabled,
+    setEnabled,
     getTargetHandles,
     setTargetHandles,
     getCachedEntry,

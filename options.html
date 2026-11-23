@@ -15,6 +15,19 @@
 
     <div id="statusMessage" class="status-message" role="status" aria-live="polite" hidden></div>
 
+    <section class="card toggle-card" aria-labelledby="enabledHeading">
+      <div>
+        <h2 id="enabledHeading">自動変換のオン / オフ</h2>
+        <p id="enabledDescription" class="description description-compact">
+          ライブチャットのハンドルネーム変換を有効にします。
+        </p>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="enabledToggle" role="switch" checked>
+        <span class="slider" aria-hidden="true"></span>
+      </label>
+    </section>
+
     <section class="card" aria-labelledby="cacheHeading">
       <h2 id="cacheHeading">キャッシュの管理</h2>
       <p class="description">

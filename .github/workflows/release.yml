@@ -1,0 +1,63 @@
+name: Release ZIP
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Verify version and tag
+        id: version
+        run: |
+          MANIFEST_VERSION=$(node -p "require('./manifest.json').version")
+          TAG_NAME="v${MANIFEST_VERSION}"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" != "${TAG_NAME}" ]]; then
+            echo "Error: Tag (${GITHUB_REF_NAME}) does not match manifest.json version (${TAG_NAME})"
+            exit 1
+          fi
+          echo "version=${MANIFEST_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "zip_name=youtube-chat-name-converter-v${MANIFEST_VERSION}.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Build release ZIP
+        run: npm run package
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: YouTube Chat Name Converter ${{ steps.version.outputs.tag }}
+          files: dist/${{ steps.version.outputs.zip_name }}
+          generate_release_notes: true
+          body: |
+            ## インストール方法（Chrome / Edge）
+
+            1. 下の **Assets** から `${{ steps.version.outputs.zip_name }}` をダウンロードします。
+            2. ダウンロードした ZIP ファイルを解凍（展開）します。
+               - **Windows**: ZIP を右クリック →「すべて展開」→ 展開されたフォルダをそのまま使います。
+               - **Mac**: ZIP をダブルクリックして解凍します。
+            3. ブラウザのアドレスバーに以下を入力して拡張機能ページを開きます。
+               - Chrome: `chrome://extensions`
+               - Edge: `edge://extensions`
+            4. **「デベロッパー モード」** をオンにします。
+            5. **「パッケージ化されていない拡張機能を読み込む」**（Edge は「展開して読み込み」）をクリックし、解凍したフォルダを選択します。
+
+            > 既存のバージョンから更新する場合は、同じフォルダを上書き解凍したあと拡張機能ページの更新（再読み込み）ボタンを押してください。

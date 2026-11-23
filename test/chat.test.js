@@ -168,6 +168,14 @@ test('chat: ChatController converts existing & observed messages and reverts whe
   await new Promise((r) => setTimeout(r, 10));
   assert.equal(author2.textContent, 'User Two');
 
+  // Toggling enabled off reverts converted messages and toggling back on re-converts them
+  controller.setEnabled(false);
+  assert.equal(author1.textContent, '@user1');
+  assert.equal(author2.textContent, '@user2');
+
+  controller.setEnabled(true);
+  assert.equal(author1.textContent, 'User One');
+
   // Changing allowlist to another streamer reverts converted messages
   controller.setAllowedHandles(['@otherstreamer']);
   assert.equal(author1.textContent, '@user1');

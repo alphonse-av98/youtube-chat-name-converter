@@ -39,6 +39,17 @@ function createMockStorageArea(initialData = {}) {
   };
 }
 
+test('storage: enabled flag defaults to true and persists boolean state', async () => {
+  const area = createMockStorageArea();
+  assert.equal(await storage.getEnabled(area), true);
+
+  await storage.setEnabled(false, area);
+  assert.equal(await storage.getEnabled(area), false);
+
+  await storage.setEnabled(true, area);
+  assert.equal(await storage.getEnabled(area), true);
+});
+
 test('storage: targetHandles round-trip preserves sanitized list', async () => {
   const area = createMockStorageArea();
   assert.deepEqual(await storage.getTargetHandles(area), []);

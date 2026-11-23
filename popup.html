@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Chat Name Converter</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="popup">
+    <header class="header">
+      <div class="brand">
+        <img src="icons/icon48.png" alt="" class="brand-icon" width="24" height="24">
+        <h1 class="brand-title">Chat Name Converter</h1>
+      </div>
+      <span id="statusBadge" class="status-badge is-active">有効</span>
+    </header>
+
+    <section class="panel toggle-panel">
+      <div class="toggle-text">
+        <label for="enabledToggle" class="toggle-label">チャンネル名へ自動変換</label>
+        <p id="toggleHint" class="hint">ライブチャットの @ハンドル をチャンネル名に変換します</p>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="enabledToggle" role="switch" checked>
+        <span class="slider" aria-hidden="true"></span>
+      </label>
+    </section>
+
+    <section id="currentChannelSection" class="panel channel-panel" hidden>
+      <div class="channel-header">
+        <span class="channel-caption">視聴中のチャンネル</span>
+        <strong id="currentChannelHandle" class="channel-handle"></strong>
+      </div>
+      <p id="currentChannelStatus" class="hint"></p>
+      <button type="button" id="toggleChannelBtn" class="btn btn-secondary btn-full"></button>
+    </section>
+
+    <section class="panel meta-panel">
+      <div class="meta-row">
+        <span class="meta-label">対象範囲</span>
+        <strong id="scopeSummary" class="meta-value">-</strong>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">保存済みキャッシュ</span>
+        <strong id="cacheCount" class="meta-value">-</strong>
+      </div>
+    </section>
+
+    <div id="feedbackMessage" class="feedback" role="status" aria-live="polite" hidden></div>
+
+    <footer class="footer">
+      <button type="button" id="openOptionsBtn" class="btn btn-primary btn-full">詳細設定を開く</button>
+    </footer>
+  </main>
+
+  <script src="src/shared/constants.js"></script>
+  <script src="src/shared/handle.js"></script>
+  <script src="src/shared/storage.js"></script>
+  <script src="src/popup/popup.js"></script>
+</body>
+</html>

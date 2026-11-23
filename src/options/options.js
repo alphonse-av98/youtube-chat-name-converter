@@ -8,10 +8,19 @@
 
   const { STORAGE_KEYS } = ns.constants;
   const { parseHandleInput, normalizeHandleKey, buildChannelUrl } = ns.handle;
-  const { getTargetHandles, setTargetHandles, getCacheStats, clearAllCache, isCacheKey } =
-    ns.storage;
+  const {
+    getEnabled,
+    setEnabled,
+    getTargetHandles,
+    setTargetHandles,
+    getCacheStats,
+    clearAllCache,
+    isCacheKey,
+  } = ns.storage;
 
   const statusMessageEl = document.getElementById('statusMessage');
+  const enabledToggleEl = document.getElementById('enabledToggle');
+  const enabledDescriptionEl = document.getElementById('enabledDescription');
   const cacheCountEl = document.getElementById('cacheCount');
   const cacheActionsEl = document.getElementById('cacheActions');
   const clearCacheBtn = document.getElementById('clearCacheBtn');
@@ -105,6 +114,25 @@
     }
   }
 
+  function renderEnabledState(enabled) {
+    if (!enabledToggleEl) return;
+    enabledToggleEl.checked = enabled;
+    if (enabledDescriptionEl) {
+      enabledDescriptionEl.textContent = enabled
+        ? '現在オンです。ライブチャットのハンドルネームをチャンネル名に変換します。'
+        : '現在オフです。変換を一時停止しています。';
+    }
+  }
+
+  async function loadEnabledState() {
+    try {
+      const enabled = await getEnabled();
+      renderEnabledState(enabled);
+    } catch (err) {
+      console.error('[YCNC] Failed to load enabled state:', err);
+    }
+  }
+
   async function loadHandles() {
     try {
       savedHandles = await getTargetHandles();
@@ -176,6 +204,24 @@
     }
   }
 
+  if (enabledToggleEl) {
+    enabledToggleEl.addEventListener('change', async () => {
+      const nextEnabled = enabledToggleEl.checked;
+      enabledToggleEl.disabled = true;
+      try {
+        await setEnabled(nextEnabled);
+        renderEnabledState(nextEnabled);
+        showStatus(nextEnabled ? '自動変換をオンにしました。' : '自動変換をオフにしました。');
+      } catch (err) {
+        console.error('[YCNC] Failed to save enabled state:', err);
+        enabledToggleEl.checked = !nextEnabled;
+        showStatus('設定の保存に失敗しました。', 'error');
+      } finally {
+        enabledToggleEl.disabled = false;
+      }
+    });
+  }
+
   clearCacheBtn.addEventListener('click', () => setClearConfirmVisible(true));
   cancelClearCacheBtn.addEventListener('click', () => setClearConfirmVisible(false));
   confirmClearCacheBtn.addEventListener('click', handleClearCacheConfirm);
@@ -185,6 +231,10 @@
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName !== 'local') return;
+
+      if (Object.prototype.hasOwnProperty.call(changes, STORAGE_KEYS.ENABLED)) {
+        renderEnabledState(changes[STORAGE_KEYS.ENABLED].newValue !== false);
+      }
 
       if (Object.prototype.hasOwnProperty.call(changes, STORAGE_KEYS.TARGET_HANDLES)) {
         const next = changes[STORAGE_KEYS.TARGET_HANDLES].newValue;
@@ -201,6 +251,7 @@
     });
   }
 
+  loadEnabledState();
   loadHandles();
   refreshCacheStats();
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -1,10 +1,11 @@
 {
   "name": "youtube-chat-name-converter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Chrome extension that converts YouTube handles back to original channel names in live chat.",
   "scripts": {
-    "test": "node test/run-tests.js"
+    "test": "node test/run-tests.js",
+    "package": "node scripts/package.js"
   },
   "engines": {
     "node": ">=16.0.0"

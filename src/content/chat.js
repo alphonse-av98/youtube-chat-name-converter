@@ -161,6 +161,7 @@
     const setTimeoutImpl = options.setTimeout || setTimeout;
     const clearTimeoutImpl = options.clearTimeout || clearTimeout;
 
+    let enabled = true;
     let allowedHandles = null;
     let cachedOwnerHandle = null;
     let chatContainer = null;
@@ -180,6 +181,7 @@
     }
 
     function canConvertNow() {
+      if (!enabled) return false;
       if (allowedHandles === null) return false;
       if (allowedHandles.length === 0) return true;
       return isConversionAllowed(allowedHandles, getCurrentChannelHandle());
@@ -243,8 +245,15 @@
         processExistingMessages();
       } else {
         revertConvertedMessages();
-        scheduleOwnerDetectionIfNeeded();
+        if (enabled) {
+          scheduleOwnerDetectionIfNeeded();
+        }
       }
+    }
+
+    function setEnabled(nextEnabled) {
+      enabled = nextEnabled !== false;
+      applyCurrentSettings();
     }
 
     function setAllowedHandles(handles) {
@@ -320,7 +329,10 @@
     return {
       start,
       stop,
+      setEnabled,
       setAllowedHandles,
+      getCurrentChannelHandle,
+      canConvertNow,
       processMessage,
       processExistingMessages,
       revertConvertedMessages,

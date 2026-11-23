@@ -6,7 +6,7 @@
     return;
   }
 
-  const { STORAGE_KEYS } = ns.constants;
+  const { STORAGE_KEYS, MESSAGES } = ns.constants;
   const { storage, cache: cacheModule, fetcher: fetcherModule, chat: chatModule } = ns;
 
   function init() {
@@ -22,21 +22,26 @@
     cacheModule.cleanupLegacyLocalStorage();
     cache.cleanupExpired();
 
-    // Load initial allowlist setting directly in the ISOLATED world (no bridge race condition)
-    storage
-      .getTargetHandles()
-      .then((handles) => {
+    // Load initial settings directly in the ISOLATED world (no bridge race condition)
+    Promise.all([storage.getEnabled(), storage.getTargetHandles()])
+      .then(([enabled, handles]) => {
+        controller.setEnabled(enabled);
         controller.setAllowedHandles(handles);
       })
       .catch((err) => {
-        console.warn('[YCNC] Failed to load target handles:', err);
+        console.warn('[YCNC] Failed to load settings:', err);
+        controller.setEnabled(true);
         controller.setAllowedHandles([]);
       });
 
-    // React to settings updates and external cache clears (e.g. from options page)
+    // React to settings updates and external cache clears (e.g. from popup/options page)
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
       chrome.storage.onChanged.addListener((changes, areaName) => {
         if (areaName !== 'local') return;
+
+        if (Object.prototype.hasOwnProperty.call(changes, STORAGE_KEYS.ENABLED)) {
+          controller.setEnabled(changes[STORAGE_KEYS.ENABLED].newValue !== false);
+        }
 
         if (Object.prototype.hasOwnProperty.call(changes, STORAGE_KEYS.TARGET_HANDLES)) {
           const nextHandles = changes[STORAGE_KEYS.TARGET_HANDLES].newValue;
@@ -46,6 +51,18 @@
         if (Object.prototype.hasOwnProperty.call(changes, STORAGE_KEYS.CACHE_CLEARED_AT)) {
           cache.clearMemory();
           fetcher.reset();
+        }
+      });
+    }
+
+    // Answer context queries from the toolbar popup (requires no extra permissions)
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+        if (request && request.type === MESSAGES.GET_CONTEXT) {
+          sendResponse({
+            channelHandle: controller.getCurrentChannelHandle(),
+            isActive: controller.canConvertNow(),
+          });
         }
       });
     }
