@@ -5,14 +5,19 @@
   "description": "A Chrome extension that converts YouTube handles (e.g., @user-id) back to original channel names in the live chat.",
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["content.js"],
-      "all_frames": true,
-      "world": "MAIN"
-    },
-    {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["bridge.js"],
+      "matches": [
+        "https://www.youtube.com/live_chat*",
+        "https://www.youtube.com/live_chat_replay*"
+      ],
+      "js": [
+        "src/shared/constants.js",
+        "src/shared/handle.js",
+        "src/shared/storage.js",
+        "src/content/cache.js",
+        "src/content/fetcher.js",
+        "src/content/chat.js",
+        "src/content/main.js"
+      ],
       "all_frames": true
     }
   ],
@@ -20,6 +25,5 @@
     "page": "options.html",
     "open_in_tab": true
   },
-  "permissions": ["storage"],
-  "host_permissions": ["https://www.youtube.com/*"]
+  "permissions": ["storage"]
 }

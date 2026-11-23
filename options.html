@@ -1,44 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YouTube Chat Name Converter Settings</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
-    h1 { font-size: 1.5em; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-    .group { margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 5px; background-color: #f9f9f9; }
-    h3 { margin-top: 0; font-size: 1.1em; }
-    button { padding: 8px 16px; margin-top: 10px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 4px; }
-    button:hover { background-color: #0056b3; }
-    input { padding: 8px; width: 200px; border: 1px solid #ccc; border-radius: 4px; }
-    .handle-list { list-style: none; padding: 0; margin-top: 15px; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; }
-    .handle-item { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-    .handle-item:last-child { border-bottom: none; }
-    .delete-btn { background-color: #dc3545; margin-top: 0; margin-left: 10px; padding: 5px 10px; font-size: 0.9em; }
-    .delete-btn:hover { background-color: #c82333; }
-    .input-container { display: flex; gap: 10px; align-items: center; }
-  </style>
+  <link rel="stylesheet" href="options.css">
 </head>
 <body>
-  <h1>YouTube Chat Name Converter Settings</h1>
-  
-  <div class="group">
-    <h3>キャッシュのクリア</h3>
-    <p>保存されているすべてのチャンネル名データを削除します。</p>
-    <button id="clearCacheBtn">キャッシュを全消去</button>
-  </div>
+  <main class="container">
+    <header class="page-header">
+      <h1>YouTube Chat Name Converter</h1>
+      <p class="subtitle">ライブチャットのハンドルネーム変換に関する設定</p>
+    </header>
 
-  <div class="group">
-    <h3>対象チャンネルの制限</h3>
-    <p>特定のチャンネルでのみ有効にする場合は、ハンドルネーム（@handle）を入力してください。<br>
-    （複数ある場合は改行して入力。空欄の場合はすべてのチャンネルで有効になります）</p>
-    <div class="input-container">
-      <input type="text" id="newHandleInput" placeholder="@handle">
-      <button id="addHandleBtn" style="margin-top: 0;">追加</button>
-    </div>
-    <ul id="handleList" class="handle-list"></ul>
-  </div>
+    <div id="statusMessage" class="status-message" role="status" aria-live="polite" hidden></div>
 
-  <script src="options.js"></script>
+    <section class="card" aria-labelledby="cacheHeading">
+      <h2 id="cacheHeading">キャッシュの管理</h2>
+      <p class="description">
+        取得済みのチャンネル名キャッシュ（有効期限: 30日）を管理します。YouTubeタブを開いていなくても消去できます。
+      </p>
+      <div class="cache-meta">
+        <span>保存済みキャッシュ:</span>
+        <strong id="cacheCount">-</strong>
+      </div>
+      <div id="cacheActions" class="actions-row">
+        <button type="button" id="clearCacheBtn" class="btn btn-danger">キャッシュを全消去</button>
+      </div>
+      <div id="clearConfirmRow" class="confirm-row" hidden>
+        <span class="confirm-text">すべてのキャッシュを削除しますか？</span>
+        <button type="button" id="confirmClearCacheBtn" class="btn btn-danger">削除する</button>
+        <button type="button" id="cancelClearCacheBtn" class="btn btn-secondary">キャンセル</button>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="handlesHeading">
+      <h2 id="handlesHeading">対象チャンネルの制限</h2>
+      <p class="description">
+        特定の配信者のチャット欄でのみ変換を有効にする場合は、ハンドルネーム（例: <code>@youtube</code>）またはチャンネルURLを追加してください。<br>
+        リストが空の場合はすべてのチャンネルで有効になります。
+      </p>
+      <form id="addHandleForm" class="input-row" novalidate>
+        <label class="sr-only" for="newHandleInput">チャンネルのハンドルネームまたはURL</label>
+        <input
+          type="text"
+          id="newHandleInput"
+          class="text-input"
+          placeholder="@handle または https://www.youtube.com/@handle"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button type="submit" id="addHandleBtn" class="btn btn-primary">追加</button>
+      </form>
+      <p id="formError" class="form-error" role="alert" hidden></p>
+      <ul id="handleList" class="handle-list"></ul>
+    </section>
+  </main>
+
+  <script src="src/shared/constants.js"></script>
+  <script src="src/shared/handle.js"></script>
+  <script src="src/shared/storage.js"></script>
+  <script src="src/options/options.js"></script>
 </body>
 </html>
